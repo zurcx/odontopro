@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import {
   Sheet,
@@ -8,9 +11,48 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { LogIn, Menu } from "lucide-react";
 
 export function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+  const session = null; // Replace with actual session management logic
+  const navItems = [
+    { href: "#profissionais", label: "Profissionais" },
+  ]
+
+  const NavLinks = () => (
+    <>
+
+      {navItems.map((item) => (
+        <Button
+          onClick={() => setIsOpen(false)}
+          key={item.href}
+          asChild
+          className="bg-transparent hover:bg-transparent text-black shadow-none"
+        >
+          <Link
+            href={item.href}
+          >{item.label}</Link>
+        </Button>
+      ))}
+
+      {session ? (
+        <Link href="/dashboard"
+        >
+          Painel da clínica
+
+
+        </Link>
+      ) : (
+        <Button>
+          Fazer login
+        </Button>
+      )}
+
+    </>
+  )
+
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-[999] py-4 px-6 bg-white"
@@ -21,11 +63,11 @@ export function Header() {
           Odonto<span className="text-emerald-500">PRO</span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-6">
-          <a href="#">Profissionais</a>
+        <nav className="hidden lg:flex items-center gap-6 space-y-4">
+          <NavLinks />
         </nav>
 
-        <Sheet>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" className="lg:hidden" size="icon">
               <Menu className="h-6 w-6" />
@@ -34,10 +76,13 @@ export function Header() {
 
           <SheetContent side="right" className="w-[240px] md:w-[320px] z-[9999]">
             <SheetTitle>Menu</SheetTitle>
+            <SheetHeader></SheetHeader>
             <SheetDescription>
               Veja nossos links
             </SheetDescription>
-
+            <nav className="flex flex-col space-y-4 mt-6">
+              <NavLinks />
+            </nav>
           </SheetContent>
 
         </Sheet>
