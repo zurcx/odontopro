@@ -31,13 +31,16 @@ export function Header() {
           className="bg-transparent hover:bg-transparent text-black shadow-none"
         >
           <Link
-            href={item.href}
+            href={item.href} className="text-base"
           >{item.label}</Link>
         </Button>
       ))}
 
       {session ? (
-        <Link href="/dashboard"
+        <Link
+          href="/dashboard"
+          className="flex items-center justify-center gap-2"
+
         >
           Painel da clínica
 
@@ -45,6 +48,7 @@ export function Header() {
         </Link>
       ) : (
         <Button>
+          <LogIn />
           Fazer login
         </Button>
       )}
