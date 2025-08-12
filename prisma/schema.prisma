@@ -27,7 +27,7 @@ model Appointment {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
-  
+
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
@@ -87,6 +87,7 @@ model User {
   status             Boolean   @default(true)
   timezone           String?
   stripe_customer_id String?
+  times              String[]  @default([])
 
   subscription Subscription?
 
@@ -100,7 +101,7 @@ model User {
   subscriptionId String?
   Service        Service[]
   Reminder       Reminder[]
-  Appointments    Appointment[]
+  Appointments   Appointment[]
 }
 
 model Account {
