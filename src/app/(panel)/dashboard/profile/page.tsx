@@ -1,8 +1,28 @@
-export default function Profile() {
+
+import getSesion from '@/lib/getSession'
+import prisma from '@/lib/prisma'
+import { redirect } from 'next/navigation'
+import { getUserData } from './_data-access/get-info-user'
+import { ProfileContent } from './_components/profile'
+
+export default async function Profile() {
+  const session = await getSesion()
+
+  if (!session) {
+    redirect("/")
+  }
+
+  const user = await getUserData({ userId: session.user?.id })
+  console.log("getUserData :", user)
+
+  if (!session) {
+    redirect("/")
+  }
+
+
   return (
-    <section>
-      <h1>Página Perfil</h1>
-      <p>Esta é a página de perfil do usuário.</p>
-    </section>
+    <ProfileContent />
+
+
   )
 }

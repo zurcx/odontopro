@@ -7,6 +7,9 @@ export default async function Dashboard() {
   if (!session) {
     redirect("/")
   }
+
+
+  console.log(session.user?.id)
   return (
     <div>
       <h1>Página Dashboard</h1>
