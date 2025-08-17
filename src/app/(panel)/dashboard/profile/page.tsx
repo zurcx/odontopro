@@ -19,10 +19,7 @@ export default async function Profile() {
     redirect("/")
   }
 
-
   return (
-    <ProfileContent />
-
-
+    <ProfileContent></ProfileContent>
   )
 }
