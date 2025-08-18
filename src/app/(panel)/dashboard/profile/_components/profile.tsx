@@ -29,9 +29,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { } from '@/components/ui/label'
+import { Label } from '@/components/ui/label'
 import Image from 'next/image'
 import imgTest from '../../../../../../public/foto1.png'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button';
 
 export function ProfileContent() {
   const form = useProfileForm();
@@ -68,6 +77,7 @@ export function ProfileContent() {
                           {...field}
                           placeholder='Digite o nome da clinica ...' />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -82,6 +92,7 @@ export function ProfileContent() {
                           {...field}
                           placeholder='Digite o endereço da clinica ...' />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -97,6 +108,7 @@ export function ProfileContent() {
                           {...field}
                           placeholder='Digite o telefone...' />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -120,9 +132,23 @@ export function ProfileContent() {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <div className='space-x-2'>
+
+                  <Label className='font-semibold'>
+                    Configurar horários da clínica
+                  </Label>
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button></Button>
+                    </DialogTrigger>
+                  </Dialog>
+                </div>
 
               </div>
             </CardContent>
