@@ -64,7 +64,7 @@ export function ProfileContent() {
   const hours = generationTimeSlots();
 
   function toggleHour(hour: string) {
-    setSelectedHours((prev) => prev.includes(hour) ? prev.filter(h => h !== hour) : [...prev, hour].sort)
+    setSelectedHours((prev) => prev.includes(hour) ? prev.filter(h => h !== hour) : [...prev, hour].sort())
   }
 
 
