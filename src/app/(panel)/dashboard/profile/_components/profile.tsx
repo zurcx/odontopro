@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react'
-import { useProfileForm } from './profile-form';
+import { ProfileFormData, useProfileForm } from './profile-form';
 import {
   Card,
   CardAction,
@@ -81,11 +81,20 @@ export function ProfileContent() {
 
   console.log(hours)
 
+  async function onSubmit(values: ProfileFormData) {
+
+    const profileData = {
+      ...values,
+      times: selectedHours
+    }
+    console.log("Values: ", profileData)
+  }
+
   return (
 
     <div className='mx-auto'>
       <Form {...form}>
-        <form>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
               <CardTitle>Meu Perfil</CardTitle>
@@ -221,7 +230,7 @@ export function ProfileContent() {
                 </div>
                 <FormField
                   control={form.control}
-                  name='timezone'
+                  name='timeZone'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>Selecione o fuso Horário</FormLabel>
