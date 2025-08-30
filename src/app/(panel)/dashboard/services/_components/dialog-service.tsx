@@ -1,7 +1,6 @@
 "use client"
 
-import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DialogDescription } from "@radix-ui/react-dialog"
+import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { DialogServiceFormData, useDialogServiceForm } from "./dialog-service-form"
 import {
   Form,
@@ -9,7 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -20,6 +19,7 @@ export function DialogService() {
 
   async function onSubmit(values: DialogServiceFormData) {
     console.log(values)
+
   }
 
   return (
@@ -32,8 +32,8 @@ export function DialogService() {
       </DialogHeader>
 
       <Form {...form}>
-        <form className="space-y-2"
-
+        <form
+          className="space-y-2"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <div className="flex flex-col">
@@ -47,22 +47,15 @@ export function DialogService() {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Digite o nome do serviço"
                       {...field}
+                      placeholder="Digite o nome do serviço"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-        </form>
 
-      </Form>
-
-      <Form {...form}>
-        <form className="space-y-2">
-          <div className="flex flex-col">
             <FormField
               control={form.control}
               name="price"
