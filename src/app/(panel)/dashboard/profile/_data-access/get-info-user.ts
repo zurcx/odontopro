@@ -1,4 +1,4 @@
-"user serve"
+"use server"
 import prisma from "@/lib/prisma"
 
 interface GetUserDataProps {
@@ -10,7 +10,7 @@ export async function getUserData({ userId }: GetUserDataProps) {
     if (!userId) {
       return null
     }
-    const user = await prisma.user?.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: userId
       },
