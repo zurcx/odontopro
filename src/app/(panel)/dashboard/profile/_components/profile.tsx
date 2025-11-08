@@ -1,37 +1,13 @@
 "use client"
+
 import { useState } from 'react'
-import { ProfileFormData, useProfileForm } from './profile-form';
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-
+import { ProfileFormData, useProfileForm } from './profile-form'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image from 'next/image'
-import imgTest from '../../../../../../public/foto1.png'
 import {
   Dialog,
   DialogContent,
@@ -39,30 +15,58 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog"
+import imgTest from '../../../../../../public/foto1.png'
+import { Label } from '@radix-ui/react-label'
+import { ArrowRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Prisma } from '@prisma/client'
+import { updateProfile } from '../_actions/update-profile'
+import { toast } from 'sonner'
+import { formatPhone, extractPhoneNumber } from '@/utils/format-phone'
+
+type UserWithSubscription = Prisma.UserGetPayLoad<{
+  include: {
+    subscription: true
+  }
+}>
 
 
-export function ProfileContent() {
+interface ProfileContentProps {
+  user: UserWithSubscription;
+}
+export function ProfileContent({ user }: ProfileContentProps) {
 
-  const [selectedHours, setSelectedHours] = useState<string[]>([])
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
-  const form = useProfileForm();
+  console.log(user);
+  const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? [])
+  const [dialogIsOpen, setDialogIsOpen] = useState(false)
 
-  function generationTimeSlots() {
+  const form = useProfileForm({
+    name: user.name,
+    address: user.address,
+    phone: user.phone,
+    status: user.status,
+    timeZone: user.timeZone
+  });
+
+  function generateTimeSlots(): string[] {
     const hours: string[] = [];
-    for (let i = 8; i <= 24; i++) {
+
+    for (let i = 8; i < 24; i++) {
       for (let j = 0; j < 2; j++) {
         const hour = i.toString().padStart(2, "0")
         const minute = (j * 30).toString().padStart(2, "0")
         hours.push(`${hour}:${minute}`)
       }
     }
-    return hours
+
+
+    return hours;
   }
-  const hours = generationTimeSlots();
+
+  const timeSlots = generateTimeSlots()
+
+  console.log(timeSlots)
 
   function toggleHour(hour: string) {
     setSelectedHours((prev) => prev.includes(hour) ? prev.filter(h => h !== hour) : [...prev, hour].sort())
@@ -73,27 +77,45 @@ export function ProfileContent() {
     zone.startsWith("America/Fortaleza") ||
     zone.startsWith("America/Recife") ||
     zone.startsWith("America/Bahia") ||
+    zone.startsWith("America/Belem") ||
     zone.startsWith("America/Manaus") ||
     zone.startsWith("America/Cuiaba") ||
     zone.startsWith("America/Boa_Vista")
-
   );
 
-  console.log(hours)
-
   async function onSubmit(values: ProfileFormData) {
+
+    const extractValue = extractPhoneNumber(values.phone || '')
+
+    console.log(extractValue)
 
     const profileData = {
       ...values,
       times: selectedHours
     }
     console.log("Values: ", profileData)
+
+    const response = await updateProfile({
+
+      name: values.name,
+      address: values.address,
+      status: values.status === 'active' ? true : false,
+      phone: values.phone,
+      timeZone: values.timeZone,
+      times: selectedHours || []
+    })
+
+    if (response.error) {
+      toast(response.error, { closeButton: true })
+      return;
+    }
+    toast(response.data)
   }
 
   return (
-
-    <div className='mx-auto'>
+    < div className='mx-auto'>
       <Form {...form}>
+
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
@@ -101,41 +123,24 @@ export function ProfileContent() {
             </CardHeader>
             <CardContent className='space-y-6'>
               <div className='flex justify-center'>
-                <div className='bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden'>
+                <div className='bg-gray-200 w-40 h-40 relative rounded-full overflow-hidden'>
                   <Image
                     src={imgTest}
-                    alt="Foto da clinica"
+                    alt="Picture of the author"
                     fill
-                    className='object-cover'
+                    className="rounded-cover"
                   />
                 </div>
               </div>
-              <div className='space-y-6'>
+              <div className='space-y-4'>
                 <FormField
                   control={form.control}
-                  name='name'
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>Nome Completo</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder='Digite o nome da clinica ...' />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='address'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className='font-semibold'>Endereço Completo</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder='Digite o endereço da clinica ...' />
+                        <Input placeholder="Nome Completo" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -144,108 +149,130 @@ export function ProfileContent() {
 
                 <FormField
                   control={form.control}
-                  name='phone'
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='font-semibold'>Endereco Completo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Digite o endereco completo ..." {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>Telefone</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder='Digite o telefone...' />
+                        <
+                          Input placeholder="(48) 99999-9999" {...field}
+                          onChange={(e) => {
+                            const formattedValue = formatPhone(e.target.value)
+                            field.onChange(formattedValue)
+                          }}
+                        />
+
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
+
                 <FormField
                   control={form.control}
-                  name='status'
+                  name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='font-semibold'>Status da Clinica</FormLabel>
+                      <FormLabel className='font-semibold'>Status da clinica</FormLabel>
                       <FormControl>
-                        <Select onValueChange={field.onChange}
+                        <Select
+                          onValueChange={field.onChange}
                           defaultValue={field.value ? "active" : "inactive"}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder='Selecione o status da clinica ' />
+                            <SelectValue placeholder="Select o status" {...field} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="active">ATIVO (Clinica Aberta)</SelectItem>
-                            <SelectItem value="inactive">INATIVO (Clinica Fechada)</SelectItem>
+                            <SelectItem value="active">ATIVO (clinica aberta)</SelectItem>
+                            <SelectItem value="inactive">INATIVO (clinica fechada)</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <div className='space-y-2'>
+                  <Label className='font-semibold'>Horarios de funcionamento</Label>
 
-                  <Label className='font-semibold' >
-                    Configurar horários da clínica
-                  </Label>
 
                   <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" className='w-full justify-between'>Clique aqui para selecionar horários
-                        <ArrowRight className='w-5 h-5'></ArrowRight>
+                      <Button variant="outline" className='w-full justify-between'>Definir horarios
+                        <ArrowRight className='w-5 h-5' />
                       </Button>
                     </DialogTrigger>
 
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>
-                          Horários da Clínica
-                        </DialogTitle>
+                        <DialogTitle>Horarios da clinica</DialogTitle>
                         <DialogDescription>
-                          Selecione abaixo os horários de funcionamento da clínica:
+                          Selecione abaixo os horarios de funcionamento da clinica
                         </DialogDescription>
                       </DialogHeader>
-                      <section className='py-4'>
-                        <p className='text-sm text-muted-foreground mb-2'>Clique nos horários abaixo para marcar e desmarcar</p>
+
+                      <section className='space-y-4 mt-4'>
+                        <p className='text-sm text-muted-foreground mb-2'>
+                          Clique nos horarios abaixo para marcar ou desmarcar:
+                        </p>
+
                         <div className='grid grid-cols-5 gap-2'>
-                          {hours.map((hour) => (
+
+                          {timeSlots.map((timeSlots) => (
                             <Button
-                              key={hour}
+                              key={timeSlots}
                               variant="outline"
-                              className={cn('h-10', selectedHours.includes(hour) && 'roudend-2 border-emerald-500 text-primary')}
-                              onClick={() => toggleHour(hour)}
+                              className={cn('border-2', selectedHours.includes(timeSlots) && 'border-2 border-emerald-500 text-primary')}
+                              onClick={() => toggleHour(timeSlots)}
                             >
-                              {hour}
+                              {timeSlots}
                             </Button>
                           ))}
                         </div>
                       </section>
-                      <Button
-                        className='w-full bg-green-500 hover:bg-green-300'
+                      <Button className='w-full'
                         onClick={() => setDialogIsOpen(false)}
                       >
                         Fechar Modal
                       </Button>
+
                     </DialogContent>
                   </Dialog>
+
                 </div>
+
                 <FormField
                   control={form.control}
-                  name='timeZone'
+                  name="timeZone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='font-semibold'>Selecione o fuso Horário</FormLabel>
+                      <FormLabel className='font-semibold'>Selecione o fuso horario</FormLabel>
                       <FormControl>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder='Selecione o seu fuso horário' />
+                            <SelectValue placeholder="Select o fuso o horaioo" {...field} />
                           </SelectTrigger>
                           <SelectContent>
                             {timeZones.map((zone) => (
 
                               <SelectItem key={zone} value={zone}>
+
                                 {zone}
                               </SelectItem>
                             ))}
@@ -258,15 +285,14 @@ export function ProfileContent() {
                 />
                 <Button
                   type='submit'
-                  className='w-full bg-emerald-500  hover:bg-emerald-400'
-                >
-                  Salvar Alterações
-                </Button>
+                  className='w-full  bg-emerald-500 hover:bg-emerald-400'
+                >Salvar</Button>
               </div>
             </CardContent>
           </Card>
         </form>
       </Form>
+      <h1>PAGINA PROFILE</h1>
     </div >
   )
 }

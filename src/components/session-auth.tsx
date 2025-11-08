@@ -1,4 +1,5 @@
-import { SessionProvider } from 'next-auth/react'
+"use client"
+import { SessionProvider } from "next-auth/react"
 
 export function SessionAuthProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -6,6 +7,4 @@ export function SessionAuthProvider({ children }: { children: React.ReactNode })
       {children}
     </SessionProvider>
   )
-
-
 }

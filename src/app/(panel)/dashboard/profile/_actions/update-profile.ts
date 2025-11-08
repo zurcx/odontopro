@@ -5,15 +5,13 @@ import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-
-
 const formSchema = z.object({
-  name: z.string().min(1, { message: "O nome é obrigatório!" }),
+  name: z.string().min(1, { message: "O nome é obrigatório" }),
   address: z.string().optional(),
   phone: z.string().optional(),
   status: z.boolean(),
   timeZone: z.string(),
-  times: z.array(z.string())
+  times: z.array(z.string()),
 })
 
 type FormSchema = z.infer<typeof formSchema>
@@ -24,7 +22,7 @@ export async function updateProfile(formData: FormSchema) {
 
   if (!session?.user?.id) {
     return {
-      error: "Usuário não encontrado!",
+      error: "Usuário não encontrado",
     }
   }
 
@@ -32,11 +30,13 @@ export async function updateProfile(formData: FormSchema) {
 
   if (!schema.success) {
     return {
-      error: "Preencha todos os campos!",
+      error: "Preencha todos os campos",
     }
   }
 
+
   try {
+
     await prisma.user.update({
       where: {
         id: session?.user?.id
@@ -50,17 +50,18 @@ export async function updateProfile(formData: FormSchema) {
         times: formData.times || []
       }
     })
-    revalidatePath("/dashboard/profile")
+
+    revalidatePath('/dashboard/profile')
+
     return {
-      data: "Clínica atualizada com sucesso!",
+      data: "Clinica atualizada com sucesso!"
     }
 
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
     return {
-      error: "Erro ao atualizar Clínica!"
+      error: "Falha ao atualizar clincia",
     }
   }
-
 
 }

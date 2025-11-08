@@ -1,32 +1,32 @@
 "use server"
-import prisma from "@/lib/prisma"
+
+import prisma from '@/lib/prisma'
 
 interface GetUserDataProps {
   userId: string;
 }
+
 export async function getUserData({ userId }: GetUserDataProps) {
   try {
-
     if (!userId) {
-      return null
+      return null;
     }
     const user = await prisma.user.findFirst({
       where: {
         id: userId
       },
       include: {
-        subscription: true,
+        subscription: true
       }
     })
     if (!user) {
-      return null
+      return null;
     }
-
     console.log(user)
-    return user
+    return user;
 
   } catch (err) {
     console.log(err)
-    return null
+    return null;
   }
 }

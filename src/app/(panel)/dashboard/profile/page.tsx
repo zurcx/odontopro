@@ -1,4 +1,3 @@
-
 import getSesion from '@/lib/getSession'
 import { redirect } from 'next/navigation'
 import { getUserData } from './_data-access/get-info-user'
@@ -12,13 +11,14 @@ export default async function Profile() {
   }
 
   const user = await getUserData({ userId: session.user?.id })
-  //  console.log("getUserData :", user)
+  console.log("GetUserData: ", user)
+
 
   if (!user) {
     redirect("/")
   }
 
   return (
-    <ProfileContent></ProfileContent>
+    <ProfileContent user={user} />
   )
 }
