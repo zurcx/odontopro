@@ -6,6 +6,7 @@ import { z } from "zod"
 import { revalidatePath } from 'next/cache'
 
 const formSchema = z.object({
+  serviceId: z.string().min(1, "O id do servico e obrigatorio"),
   name: z.string().min(1, { message: "Nome do serviço é obrigatório." }),
   price: z.number().min(1, { message: "Preço do serviço é obrigatório." }),
   duration: z.number(),
@@ -13,16 +14,16 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>
 
-export async function createNewService(formData: FormSchema) {
+export async function updateService(formData: FormSchema) {
   const session = await auth();
 
   if (!session?.user?.id) {
     return {
-      error: "Usuário não autenticado."
+      error: "Falha ao atualizar servico"
     }
   }
 
-  const schema = formSchema.safeParse(formData)
+  const schema = formSchema.safeParse(formData);
 
   if (!schema.success) {
     return {
@@ -31,25 +32,28 @@ export async function createNewService(formData: FormSchema) {
   }
 
   try {
-    const newService = await prisma.service.create({
+    await prisma.service.update({
+      where: {
+        id: formData.serviceId,
+        userId: session?.user?.id
+      },
       data: {
         name: formData.name,
         price: formData.price,
-        duration: formData.duration,
-        userId: session?.user?.id
+        duration: formData.duration < 30 ? 30 : formData.duration
       }
     })
 
     revalidatePath("/dashboard/services")
-    return { data: newService }
 
+    return {
+      data: "Servico atulizado com sucesso"
+    }
 
   } catch (err) {
     console.log(err);
     return {
-      error: "Erro ao criar o serviço. Tente novamente.",
+      error: "Falha ao atualizar servico"
     }
   }
-
-
 }

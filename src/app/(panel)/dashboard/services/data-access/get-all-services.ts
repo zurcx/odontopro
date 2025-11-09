@@ -4,8 +4,11 @@ import prisma from "@/lib/prisma"
 
 export async function getAllServices({ userId }: { userId: string }) {
   if (!userId) {
-    error: "Falha ao carregar os serviços."
+    return {
+      error: "Falha ao carregar os serviços."
+    }
   }
+
   try {
     const services = await prisma.service.findMany({
       where: {
@@ -13,6 +16,7 @@ export async function getAllServices({ userId }: { userId: string }) {
         status: true
       }
     })
+
     return {
       data: services
     }
