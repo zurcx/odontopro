@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { useAppointmentForm } from "./schedule-form";
 import { formatPhone } from '@/utils/formatPhone'
 import { DateTimePicker } from "./date-picker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type UserWithServiceAndSubsript = Prisma.UserGetPayLoad<{
   include: {
@@ -122,7 +123,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 space-y-1">
-                  <FormLabel className="font-semibold">Telefone:</FormLabel>
+                  <FormLabel className="font-semibold">Data do agendamento:</FormLabel>
                   <FormControl>
                     <DateTimePicker
                       initialDate={new Date()}
@@ -134,6 +135,33 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                       }}
                     />
 
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+
+
+            <FormField
+              control={form.control}
+              name="serviceId"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2 space-y-1">
+                  <FormLabel className="font-semibold">Selecione o servico:</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o servico"></SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clinic.services.map((service) => (
+                          <SelectItem key={service.id} value={service.id}>
+                            {service.name} - {Math.floor(service.duration / 60)}h {service.duration % 60}min
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                 </FormItem>
               )}
