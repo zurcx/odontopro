@@ -1,0 +1,12 @@
+{
+    "vim.useSystemClipboard": true,
+    "vim.hlsearch": true,
+    "editor.lineNumbers": "relative",
+    "editor.cursorBlinking": "solid",
+    "editor.renderWhitespace": "all",
+    "vim.leader": "<space>",
+    "vim.handleKeys": {
+        "<C-a>": false,
+        "<C-f>": false
+    }
+}
