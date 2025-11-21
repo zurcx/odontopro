@@ -80,6 +80,19 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
           time: time,
           available: !blocked.includes(times)
         }))
+
+
+        // se o slot atual estiver indisponivel , limpamos a <selecao>
+
+        const stillAvailable = finalSlots.find(
+          (slot) => slot.time === selectedTime && slot.available
+        )
+
+        if (!stillAvailable) {
+          setSelectedTIme("")
+        }
+
+
         setAvailableTimeSlots(finalSlots)
 
       })
